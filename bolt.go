@@ -22,26 +22,6 @@ type boltKv struct {
 	db *bolt.DB
 }
 
-// NewBoltKv provides a new instance of KV with bolt db as backend.
-func NewBoltKv(dbFile, nameSpace string) (KV, CloseFunc, error) {
-	kv := new(boltKv)
-	kv.nameSpace = nameSpace
-	var err error
-	kv.db, err = bolt.Open(dbFile, 0666, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-	f := func() error { return kv.db.Close() }
-
-	if err := kv.db.Update(func(t *bolt.Tx) error {
-		_, err := t.CreateBucketIfNotExists([]byte(nameSpace))
-		return err
-	}); err != nil {
-		return nil, nil, err
-	}
-	return kv, f, nil
-}
-
 // Set sets a value at a key.
 func (kv *boltKv) Set(key string, val []byte) error {
 	if len(key) == 0 || val == nil {
@@ -55,7 +35,7 @@ func (kv *boltKv) Set(key string, val []byte) error {
 		bucketList := strings.Split(filepath.Join(kv.nameSpace, key), "/")
 		b := t.Bucket([]byte(bucketList[0]))
 		bucketList = bucketList[1:]
-		if len(bucketList) > 1 {
+		if len(bucketList) > 0 {
 			var err error
 			for i := 0; i < len(bucketList)-1; i++ {
 				b, err = b.CreateBucketIfNotExists([]byte(bucketList[i]))
@@ -72,12 +52,16 @@ func (kv *boltKv) Set(key string, val []byte) error {
 
 // Get gets a value from a key.
 func (kv *boltKv) Get(key string) ([]byte, error) {
+	if len(key) == 0 {
+		return nil, fmt.Errorf("key can not be empty")
+	}
+
 	var val []byte
 	err := kv.db.View(func(t *bolt.Tx) error {
 		bucketList := strings.Split(filepath.Join(kv.nameSpace, key), "/")
 		b := t.Bucket([]byte(bucketList[0]))
 		bucketList = bucketList[1:]
-		if len(bucketList) > 1 {
+		if len(bucketList) > 0 {
 			for i := 0; i < len(bucketList)-1; i++ {
 				val := b.Get([]byte(bucketList[i]))
 				if val != nil {
@@ -97,11 +81,22 @@ func (kv *boltKv) Get(key string) ([]byte, error) {
 		return nil
 	})
 
+	// we have ensured during Set that value for any key cannot be nil.
+	// A nil value means either key points to a bucket or key does not exist.
+	// Both such conditions should result in error for the use case of this pkg.
+	if val == nil {
+		err = fmt.Errorf("invalid key")
+	}
+
 	return val, err
 }
 
 // Delete delets a key.
 func (kv *boltKv) Delete(key string) error {
+	if len(key) == 0 {
+		return fmt.Errorf("key can not be empty")
+	}
+
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
@@ -109,7 +104,7 @@ func (kv *boltKv) Delete(key string) error {
 		bucketList := strings.Split(filepath.Join(kv.nameSpace, key), "/")
 		b := t.Bucket([]byte(bucketList[0]))
 		bucketList = bucketList[1:]
-		if len(bucketList) > 1 {
+		if len(bucketList) > 0 {
 			for i := 0; i < len(bucketList)-1; i++ {
 				val := b.Get([]byte(bucketList[i]))
 				if val != nil {
@@ -132,4 +127,45 @@ func (kv *boltKv) Delete(key string) error {
 			return b.Delete([]byte(key))
 		}
 	})
+}
+
+func (kv *boltKv) Enumerate(key string) ([]string, error) {
+	var list []string
+	err := kv.db.View(func(t *bolt.Tx) error {
+
+		// Get the bucket on which we would iterate for keys
+		bucketList := strings.Split(filepath.Join(kv.nameSpace, key), "/")
+		b := t.Bucket([]byte(bucketList[0]))
+		bucketList = bucketList[1:]
+		if len(bucketList) > 0 {
+			for i := 0; i < len(bucketList); i++ {
+				val := b.Get([]byte(bucketList[i]))
+				if val != nil {
+					return fmt.Errorf(bucketList[i],
+						"does not point at a bucket, it points to a value")
+				}
+				b = b.Bucket([]byte(bucketList[i]))
+				if b == nil {
+					return fmt.Errorf("bucket does not exist:%s",
+						filepath.Join(bucketList[:i+1]...))
+				}
+			}
+		}
+
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if v != nil {
+				list = append(list, filepath.Join(key, string(k)))
+			} else {
+				if subList, err := kv.Enumerate(filepath.Join(key, string(k))); err != nil {
+					return err
+				} else {
+					list = append(list, subList...)
+				}
+			}
+		}
+		return nil
+	})
+
+	return list, err
 }

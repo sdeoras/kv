@@ -10,4 +10,6 @@ type KV interface {
 	// Delete delets a key deleting everything in the tree
 	// if key points to a bucket name.
 	Delete(key string) error
+	// Enumerate lists keys
+	Enumerate(key string) ([]string, error)
 }
