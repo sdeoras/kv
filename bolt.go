@@ -100,7 +100,7 @@ func (kv *boltKv) Delete(key string) error {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
-	return kv.db.Update(func(t *bolt.Tx) error {
+	err := kv.db.Update(func(t *bolt.Tx) error {
 		bucketList := strings.Split(filepath.Join(kv.nameSpace, key), "/")
 		b := t.Bucket([]byte(bucketList[0]))
 		bucketList = bucketList[1:]
@@ -127,6 +127,12 @@ func (kv *boltKv) Delete(key string) error {
 			return b.Delete([]byte(key))
 		}
 	})
+
+	if err != nil {
+		return fmt.Errorf("key or bucket could not be deleted:%v", err)
+	}
+
+	return nil
 }
 
 func (kv *boltKv) Enumerate(key string) ([]string, error) {
