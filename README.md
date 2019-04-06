@@ -8,8 +8,12 @@ go get github.com/sdeoras/kv
 
 ## usage
 This package defines an interface and provides an implementation
-using `boltdb`. To create an instance of `kv` using `boltdb` as
-backend you can use the `New` method as follows:
+using `boltdb` and an in-memory database.
+
+### boltdb backend
+To create an instance of `kv` using `boltdb` as
+backend you can use the `NewBoltKv` function as follows. A namespace is
+simply a partition inside the database file.
 ```go
 import "github.com/sdeoras/kv"
 
@@ -25,6 +29,18 @@ func main() {
 	if val, err := kvdb.Get(key); err != nil {
 		// handle err
 	}
+}
+``` 
+
+### in-memory backend
+To create an instance of `KV` using in-memory backend you can use
+`NewMemKv` function as follows:
+```go
+import "github.com/sdeoras/kv"
+
+func main() {
+	kvdb, err := kv.NewMemKv()
+	// handle err
 }
 ``` 
 

@@ -13,3 +13,13 @@ type KV interface {
 	// Enumerate lists keys
 	Enumerate(key string) ([]string, error)
 }
+
+// NewBoltKv provides a new instance of KV with bolt db as backend.
+func NewBoltKv(dbFile, nameSpace string) (KV, CloseFunc, error) {
+	return newBoltKv(dbFile, nameSpace)
+}
+
+// NewMemKv provides a new instance of KV with mem db as backend.
+func NewMemKv() KV {
+	return newMemKv()
+}
