@@ -1,5 +1,10 @@
 package kv
 
+import "context"
+
+// CloseFunc is a closure that can be deferred called to close the database.
+type CloseFunc func() error
+
 // KV defines a minimalist interface to a key value store.
 type KV interface {
 	// Set sets a value against a key.
@@ -22,4 +27,9 @@ func NewBoltKv(dbFile, nameSpace string) (KV, CloseFunc, error) {
 // NewMemKv provides a new instance of KV with mem db as backend.
 func NewMemKv() KV {
 	return newMemKv()
+}
+
+// NewDataStoreKv provides a new instance of KV with Google cloud data-store as backend.
+func NewDataStoreKv(ctx context.Context, projectID, nameSpace string) (KV, CloseFunc, error) {
+	return newDataStoreKv(ctx, projectID, nameSpace)
 }

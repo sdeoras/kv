@@ -9,9 +9,6 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// CloseFunc is a closure that can be deferred called to close the database.
-type CloseFunc func() error
-
 // boltKv implements KV interface using boltdb as backend kv store.
 type boltKv struct {
 	// mu is used to lock update operations on database.
@@ -23,7 +20,7 @@ type boltKv struct {
 }
 
 // newBoltKv provides a new instance of KV with bolt db as backend.
-func newBoltKv(dbFile, nameSpace string) (*boltKv, CloseFunc, error) {
+func newBoltKv(dbFile, nameSpace string) (*boltKv, func() error, error) {
 	kv := new(boltKv)
 	kv.nameSpace = nameSpace
 	var err error
