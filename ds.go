@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sync"
 
 	"cloud.google.com/go/datastore"
 )
 
 type dsKv struct {
+	mu        sync.Mutex
 	ctx       context.Context
 	nameSpace string
 	client    *datastore.Client
@@ -66,6 +68,9 @@ func (d *dsKv) Get(key string) ([]byte, error) {
 }
 
 func (d *dsKv) Set(key string, val []byte) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	if len(key) == 0 {
 		return fmt.Errorf("cannot set empty key")
 	}
@@ -104,6 +109,9 @@ func (d *dsKv) Set(key string, val []byte) error {
 }
 
 func (d *dsKv) Delete(key string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	keys, err := d.enumerate(key)
 	if err != nil {
 		return err
