@@ -3,6 +3,8 @@ module github.com/sdeoras/kv
 go 1.12
 
 require (
+	cloud.google.com/go v0.37.2
 	github.com/boltdb/bolt v1.3.1
-	golang.org/x/sys v0.0.0-20190405154228-4b34438f7a67 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

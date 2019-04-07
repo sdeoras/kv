@@ -7,8 +7,10 @@ go get github.com/sdeoras/kv
 ```
 
 ## usage
-This package defines an interface and provides an implementation
-using `boltdb` and an in-memory database.
+This package defines an interface and provides following implementations:
+* boltdb
+* in-memory database
+* Google cloud data-store
 
 ### boltdb backend
 To create an instance of `kv` using `boltdb` as
@@ -41,6 +43,19 @@ import "github.com/sdeoras/kv"
 func main() {
 	kvdb, err := kv.NewMemKv()
 	// handle err
+}
+``` 
+
+### Google cloud data-store backend
+To create an instance of `KV` using google cloud data-store as backend you can use
+`NewDataStoreKv` function as follows:
+```go
+import "github.com/sdeoras/kv"
+
+func main() {
+	kvdb, closeKv, err := kv.NewDataStoreKv(context.Background(), projectID, nameSpace)
+	// handle err
+	defer closeKv()
 }
 ``` 
 
