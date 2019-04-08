@@ -7,12 +7,21 @@ go get github.com/sdeoras/kv
 ```
 
 ## usage
-This package defines an interface and provides following implementations:
+This package defines a minimalist key-value interface and provides following implementations:
 * boltdb
 * in-memory database
 * Google cloud data-store
 
-### boltdb backend
+## keys
+Keys can be simple strings or be written in a filepath format, e.g. `a/b/c/myKey`. Keys are parsed
+and appropriate nested tree structure is constructed for whichever backend is being used.
+
+Furthermore, a tree can be deleted simply by entering partial key (e.g. `a/b`), that is a common
+prefix to other keys in that tree.
+
+Leading `/` is ignored, i.e., `/a/b/c/myKey` is the same as `a/b/c/myKey`.
+
+### using boltdb database as backend
 To create an instance of `kv` using `boltdb` as
 backend you can use the `NewBoltKv` function as follows. A namespace is
 simply a partition inside the database file.
@@ -34,7 +43,7 @@ func main() {
 }
 ``` 
 
-### in-memory backend
+### using in-memory database backend
 To create an instance of `KV` using in-memory backend you can use
 `NewMemKv` function as follows:
 ```go
@@ -46,7 +55,7 @@ func main() {
 }
 ``` 
 
-### Google cloud data-store backend
+### using google cloud data-store backend
 To create an instance of `KV` using google cloud data-store as backend you can use
 `NewDataStoreKv` function as follows:
 ```go
