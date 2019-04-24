@@ -2,14 +2,11 @@ package kv
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 )
 
 func TestMemKv_GetSet(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -26,8 +23,6 @@ func TestMemKv_GetSet(t *testing.T) {
 }
 
 func TestMemKv_GetSetWrongKey(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -42,8 +37,6 @@ func TestMemKv_GetSetWrongKey(t *testing.T) {
 }
 
 func TestMemKv_GetSetWrongBucket(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -58,8 +51,6 @@ func TestMemKv_GetSetWrongBucket(t *testing.T) {
 }
 
 func TestMemKv_SetEmptyKey(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -69,8 +60,6 @@ func TestMemKv_SetEmptyKey(t *testing.T) {
 }
 
 func TestMemKv_GetEmptyKey(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -85,8 +74,6 @@ func TestMemKv_GetEmptyKey(t *testing.T) {
 }
 
 func TestMemKv_GetBucket(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -101,8 +88,6 @@ func TestMemKv_GetBucket(t *testing.T) {
 }
 
 func TestMemKv_SetNilValue(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -112,8 +97,6 @@ func TestMemKv_SetNilValue(t *testing.T) {
 }
 
 func TestMemKv_SetZeroValue(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -123,8 +106,6 @@ func TestMemKv_SetZeroValue(t *testing.T) {
 }
 
 func TestMemKv_GetZeroValue(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -146,8 +127,6 @@ func TestMemKv_GetZeroValue(t *testing.T) {
 }
 
 func TestMemKv_DeleteKey(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -167,8 +146,6 @@ func TestMemKv_DeleteKey(t *testing.T) {
 }
 
 func TestMemKv_DeleteTree(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -199,8 +176,6 @@ func TestMemKv_DeleteTree(t *testing.T) {
 }
 
 func TestMemKv_DeleteDeletedKey(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -226,8 +201,6 @@ func TestMemKv_DeleteDeletedKey(t *testing.T) {
 }
 
 func TestMemKv_Enumerate(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -256,8 +229,6 @@ func TestMemKv_Enumerate(t *testing.T) {
 }
 
 func TestMemKv_DeleteEnumerate(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
@@ -294,8 +265,6 @@ func TestMemKv_DeleteEnumerate(t *testing.T) {
 }
 
 func TestMemKv_DeleteAllEnumerate(t *testing.T) {
-	defer func() { _ = os.Remove(dbFileName) }()
-
 	kv := NewMemKv()
 
 	// set something
